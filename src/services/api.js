@@ -8,10 +8,9 @@ const rawApiUrl = (import.meta.env.VITE_API_URL || "").trim();
 const normalizeApiBaseUrl = (value) => {
   if (!value) return "";
 
-  const withoutTrailingSlash = value.replace(/\/+$/, "");
-  return withoutTrailingSlash.endsWith("/api")
-    ? withoutTrailingSlash
-    : `${withoutTrailingSlash}/api`;
+  const trimmed = value.replace(/\/+$/, "");
+  const withScheme = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed) ? trimmed : `https://${trimmed}`;
+  return withScheme.endsWith("/api") ? withScheme : `${withScheme}/api`;
 };
 
 const resolveApiBaseUrl = () => {
