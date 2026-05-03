@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-3">
-              <img src={logoUrl} alt="DocFlow Pro" className="h-5 w-5 object-contain" />
+              <img src={logoUrl} alt="DocFlow Pro" className="h24 w-24 object-contain" />
               DocFlow Pro
             </h3>
             <p className="text-sm">

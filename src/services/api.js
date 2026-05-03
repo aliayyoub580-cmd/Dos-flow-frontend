@@ -3,7 +3,31 @@
  * Handles all communication with backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const rawApiUrl = (import.meta.env.VITE_API_URL || "").trim();
+
+const normalizeApiBaseUrl = (value) => {
+  if (!value) return "";
+
+  const withoutTrailingSlash = value.replace(/\/+$/, "");
+  return withoutTrailingSlash.endsWith("/api")
+    ? withoutTrailingSlash
+    : `${withoutTrailingSlash}/api`;
+};
+
+const resolveApiBaseUrl = () => {
+  if (rawApiUrl) {
+    return normalizeApiBaseUrl(rawApiUrl);
+  }
+
+  if (import.meta.env.DEV) {
+    return "http://localhost:5000/api";
+  }
+
+  // In production, avoid a localhost fallback that causes browser network errors.
+  return "/api";
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 /**
  * Get all available tools
@@ -53,7 +77,12 @@ export const createConversionJob = async (file, toolId, onProgress = null) => {
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(JSON.parse(xhr.responseText));
         } else {
-          reject(new Error(xhr.responseText || "Conversion failed"));
+          try {
+            const payload = JSON.parse(xhr.responseText);
+            reject(new Error(payload?.error || payload?.message || "Conversion failed"));
+          } catch {
+            reject(new Error(xhr.responseText || "Conversion failed"));
+          }
         }
       });
 
